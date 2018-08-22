@@ -8,7 +8,7 @@ import {
   Image
 } from 'react-native';
 
-import fetchWeather from '../api/api';
+
 import styles from './Styles'
 
 const DEFAULT_CITY = "Budapest";
@@ -26,28 +26,28 @@ class FlatListItem extends Component{
 
     render()
     {
-        debugger;
+        
               return(
                 <View style={{flex: 1}}>  
                     <View style={{flexDirection: 'row', height: 200,  }}>
                         <View style={{flex: 1, flexDirection: 'column'}}>
                             <View style={{flex: 2, justifyContent: 'center'}}>
-                                <Text style={{fontSize: 40, fontWeight: 'bold', textAlign:  'center',}}> {this.props.name} </Text>
+                                <Text style={{fontSize: 40, fontWeight: 'bold', textAlign:  'center',}}> {this.props.item.name} </Text>
                             </View>
                             <View style={{flex: 1,  }}>
-                                <Text style={{fontSize: 25, textAlign:  'center'}}> {this.props.country}  </Text>
+                                <Text style={{fontSize: 25, textAlign:  'center'}}> {this.props.item.country}  </Text>
                             </View>
                         </View>
 
                         <View style={{flex: 1, flexDirection: 'column'}}>
-                            <View style={{flex: 1,  justifyContent: 'center'}}>
-                                <Text style={{textAlign:  'center'}}> {this.props.item.icon}  </Text>
+                            <View style={{flex: 1,  justifyContent: 'center', alignItems: 'center'}}>
+                                <Image style = {{ width: 100, height: 100,}} source={{uri:`http://openweathermap.org/img/w/${this.props.item.icon}.png`}}></Image> 
                             </View>
                             <View style={{flex: 1, justifyContent: 'center' }}>
-                                <Text style={{textAlign:  'center', fontSize: 30}}> {this.props.item.main} </Text>
+                                <Text style={{textAlign:  'center', fontSize: 30}}> {this.props.item.description} </Text>
                             </View>
                             <View style={{flex: 1,justifyContent: 'center' }}>
-                                <Text style={{textAlign:  'center', fontSize: 25}}> {this.props.temperature} </Text>
+                                <Text style={{textAlign:  'center', fontSize: 25}}> {this.props.item.temperature - 274.15  }°C </Text>
                             </View>
                         </View>
 
@@ -60,6 +60,9 @@ class FlatListItem extends Component{
         );
     }
 }
+
+var weatherConditions = [];
+var cityNames = ["washington", "budapest", "new york", "paris", "nagykanizsa", "zalaegerszeg", "debrecen"];
 
 export default class BasicFlatList extends Component {
 
@@ -82,33 +85,46 @@ export default class BasicFlatList extends Component {
         }
     }
 
+
+    ///////////////////////////////////////////////////
+    // Adatok lekerese az api-bol, majd a szukseges adatok tovabbpasszolasa a state-be
+
     getWeather = () => 
     {
-        return fetch('http://api.openweathermap.org/data/2.5/weather?q=nagykanizsa&appid=28c74e0a254572c6c9dcab44bb2ab502')
-        .then((response) => response.json())
-        .then((responseJson) => {
-  
-          this.setState({
-            
-            data: responseJson.weather,
-            temperature: responseJson.main.temp,
-            name: responseJson.name,
-            country: responseJson.sys.country,
-            isLoading: false,
-             
-  
-          }, function(){
-  
-          });
-  
-        })
-        .catch((error) =>{
-          alert(error);
-        });
+       
+
+        for(var i = 0; i < cityNames.length; i++)
+        {
+            fetch(`http://api.openweathermap.org/data/2.5/weather?q=${cityNames[i]}&appid=28c74e0a254572c6c9dcab44bb2ab502`)
+            .then((response) => response.json())
+            .then((responseJson) => {
+                var myObj = 
+                {
+                    "name": "" + responseJson.name,
+                    "icon": "" + responseJson.weather[0].icon,
+                    "description" : "" + responseJson.weather[0].description,    
+                    "temperature" : ""+ responseJson.main.temp,
+                    "country": "" + responseJson.sys.country
+                };
+                
+                weatherConditions.push(myObj);
+                this.setState({
+                    isLoading: false,
+                    
+                    
+
+                }, function()
+                {
+
+                });
+                
+                })
+                .catch((error) =>{
+                alert(error);
+                });
+        }
         
     }
-
-
 
     componentDidMount()
     {
@@ -125,6 +141,9 @@ export default class BasicFlatList extends Component {
 
     render() {
 
+        /////////////////////////////////////
+        // Ha meg az adatok nem jottek le
+
         if (this.state.isLoading)
         {
             return(
@@ -134,17 +153,14 @@ export default class BasicFlatList extends Component {
             )
         }
         
-        return (
-        
+        return (        
             <View style={{backgroundColor: 'mediumseagreen', flex: 1}}>
                 <TextInput style={styles.input} editable = {true}/>
                 <View style={{height: 3, backgroundColor: 'black'}}></View>
                 <FlatList
-                    data={this.state.data}
+                    data={weatherConditions}
                     renderItem={({item}) => { return (<FlatListItem item={item}  
-                                                                    temperature={this.state.temperature - 272.15} 
-                                                                    name={this.state.name}  
-                                                                    country={this.state.country} /> );}}
+                                                                    /> );}}
                     keyExtractor={(item, index) => index}
                 />
             </View> 
