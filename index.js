@@ -1,4 +1,5 @@
 import { AppRegistry } from 'react-native';
+//import App from './components_02/Weather'
 import App from './components_03/components/Weather'
 import { fetchWeatherItem } from './components_03/actions';
 import configureStore from './components_03/store';
@@ -32,4 +33,5 @@ class WeatherAppProvider extends React.Component
 }
 
 
+//AppRegistry.registerComponent('WeatherApp', () => App);
 AppRegistry.registerComponent('WeatherApp', () => WeatherAppProvider);
