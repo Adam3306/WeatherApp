@@ -8,18 +8,12 @@ import React from 'react';
 
 
 const store = configureStore();
+var cityNames = ["Nagykanizsa", "Gyékényes","Zalaegerszeg","Debrecen","Hamburg","Amsterdam","Kalocsa","Washington DC.","New York","Paris"];
 
-
-store.dispatch(fetchWeatherItem("Nagykanizsa"));
-store.dispatch(fetchWeatherItem("Gyékényes"));
-store.dispatch(fetchWeatherItem("Zalaegerszeg"));
-store.dispatch(fetchWeatherItem("Debrecen"));
-store.dispatch(fetchWeatherItem("Hamburg"));
-store.dispatch(fetchWeatherItem("Amsterdam"));
-store.dispatch(fetchWeatherItem("Kalocsa"));
-store.dispatch(fetchWeatherItem("Washington DC."));
-store.dispatch(fetchWeatherItem("New York"));
-store.dispatch(fetchWeatherItem("Paris"));
+for(var i = 0;  i < cityNames.length; i++)
+{
+    store.dispatch(fetchWeatherItem(cityNames[i]));
+}
 
 class WeatherAppProvider extends React.Component
 {
